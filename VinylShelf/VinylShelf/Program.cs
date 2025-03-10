@@ -26,7 +26,9 @@ builder.Services.AddDbContext<ApplicationDatabaseContext>(options =>
     options.UseNpgsql(connectionString);
 });
 
+builder.Services.AddScoped<IRecordRepository, RecordRepository>();
 builder.Services.AddScoped<IArtistRepository, ArtistRepository>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
