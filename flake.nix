@@ -14,9 +14,9 @@
       buildInputs = [
         pkgs.dotnet-sdk_8   
         pkgs.dotnet-runtime
-	# entity framework command line utils
-	pkgs.dotnet-ef
-	pkgs.zsh
+				# entity framework command line utils
+				pkgs.dotnet-ef
+				pkgs.zsh
       ];
 
       shellHook = ''
