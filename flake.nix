@@ -17,6 +17,8 @@
 				# entity framework command line utils
 				pkgs.dotnet-ef
 				pkgs.zsh
+        # htmx language server
+        pkgs.htmx-lsp
       ];
 
       shellHook = ''
