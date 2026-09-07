@@ -7,17 +7,21 @@
 
 <svelte:head><link rel="icon" href={favicon} /></svelte:head>
 
-<nav>
-  <div class="flex md:flex md:grow flex-row-reverse space-x-1 p-4">
-    {#if data.user}
-      <form method="POST" action="/logout">
-        <button class="p-3 font-bold" type="submit">Logout</button>
-      </form>
-    {:else}
-      <a class="p-3 font-bold" href="/login">Login</a>
-    {/if}
-    <a class="p-3 font-bold" href="/library">Library</a>
+<header class="site-header">
+  <div class="site-header-inner">
+    <a class="brand" href="/">Vinyl Shelf</a>
+
+    <nav class="flex items-center gap-1">
+      <a class="nav-link" href="/library">Library</a>
+      {#if data.user}
+        <form method="POST" action="/logout">
+          <button class="nav-link" type="submit">Logout</button>
+        </form>
+      {:else}
+        <a class="nav-link" href="/login">Login</a>
+      {/if}
+    </nav>
   </div>
-</nav>
+</header>
 
 {@render children()}

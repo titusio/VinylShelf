@@ -1,1 +1,200 @@
-@import 'tailwindcss';
+@import "tailwindcss";
+
+/* ---------------------------------------------------------------------------
+   Design tokens.
+
+   Everything visual is expressed in terms of these, so a palette or radius
+   change happens here once instead of in every component. Tailwind generates
+   utilities from them too (`--color-accent` -> `bg-accent`, `text-accent`, ...),
+   which is what the component classes below are built out of.
+--------------------------------------------------------------------------- */
+@theme {
+  --color-surface: oklch(0.985 0.002 265); /* page background */
+  --color-raised: oklch(1 0 0); /* cards, inputs, anything above the page */
+  --color-line: oklch(0.92 0.004 265); /* borders and rules */
+  --color-ink: oklch(0.24 0.012 265); /* primary text */
+  --color-ink-muted: oklch(0.55 0.01 265); /* secondary text */
+  --color-accent: oklch(0.53 0.17 264);
+  --color-accent-strong: oklch(0.46 0.18 264); /* accent hover/active */
+  --color-danger: oklch(0.52 0.19 25);
+  --color-danger-surface: oklch(0.97 0.02 25);
+
+  --radius-control: 0.5rem; /* inputs, buttons */
+  --radius-card: 0.75rem; /* cards, cover art */
+
+  --size-cover: 9rem; /* one source of truth for cover art */
+}
+
+@layer base {
+  body {
+    @apply bg-surface text-ink antialiased;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Components
+--------------------------------------------------------------------------- */
+@layer components {
+  /* --- Page scaffolding --- */
+  .page {
+    @apply mx-auto w-full max-w-5xl px-6 py-8;
+  }
+
+  .page-header {
+    @apply mb-8;
+  }
+
+  .page-title {
+    @apply text-2xl font-semibold tracking-tight;
+  }
+
+  .page-subtitle {
+    @apply mt-1 text-sm text-ink-muted;
+  }
+
+  .section-title {
+    @apply text-base font-semibold tracking-tight;
+  }
+
+  .muted {
+    @apply text-sm text-ink-muted;
+  }
+
+  .card {
+    @apply rounded-card border border-line bg-raised p-6;
+  }
+
+  .empty-state {
+    @apply rounded-card border border-dashed border-line px-6 py-12 text-center text-sm text-ink-muted;
+  }
+
+  /* --- Navigation --- */
+  .site-header {
+    @apply border-b border-line bg-raised;
+  }
+
+  .site-header-inner {
+    @apply mx-auto flex max-w-5xl items-center justify-between gap-4 px-6 py-4;
+  }
+
+  .brand {
+    @apply text-sm font-semibold tracking-tight;
+  }
+
+  .nav-link {
+    @apply rounded-control px-3 py-1.5 text-sm text-ink-muted transition-colors hover:bg-surface hover:text-ink;
+  }
+
+  .tabs {
+    @apply -mb-px flex gap-1;
+  }
+
+  .tab {
+    @apply border-b-2 border-transparent px-3 py-2 text-sm font-medium text-ink-muted transition-colors hover:text-ink;
+  }
+
+  .tab[aria-current="page"] {
+    @apply border-accent text-accent;
+  }
+
+  /* --- Forms --- */
+  .form-row {
+    @apply flex flex-wrap items-end gap-4;
+  }
+
+  .form-stack {
+    @apply flex flex-col gap-4;
+  }
+
+  .form-actions {
+    @apply mt-6 flex items-center gap-3;
+  }
+
+  .field {
+    @apply flex flex-col gap-1.5;
+  }
+
+  .field-label {
+    @apply text-xs font-medium text-ink-muted;
+  }
+
+  .input {
+    @apply w-full rounded-control border border-line bg-raised px-3 py-2 text-sm text-ink
+      transition-shadow outline-none
+      placeholder:text-ink-muted
+      focus:border-accent focus:ring-2 focus:ring-accent/25;
+  }
+
+  .btn {
+    @apply inline-flex cursor-pointer items-center justify-center rounded-control px-4 py-2
+      text-sm font-medium transition-colors;
+  }
+
+  .btn-primary {
+    @apply bg-accent text-white hover:bg-accent-strong;
+  }
+
+  .btn-secondary {
+    @apply border border-line bg-raised text-ink hover:bg-surface;
+  }
+
+  .btn-ghost {
+    @apply text-ink-muted hover:text-ink;
+  }
+
+  /* --- Feedback --- */
+  .alert {
+    @apply rounded-control border px-4 py-3 text-sm;
+  }
+
+  .alert-error {
+    @apply border-danger/25 bg-danger-surface text-danger;
+  }
+
+  /* --- Covers ---
+     Shared by the shelf and the cover picker so a saved record looks exactly
+     like the candidate that produced it. */
+  .cover-grid {
+    @apply grid gap-5;
+    grid-template-columns: repeat(auto-fill, minmax(var(--size-cover), 1fr));
+  }
+
+  .cover-art {
+    @apply aspect-square w-full rounded-card border border-line bg-raised object-cover;
+  }
+
+  .cover-art-empty {
+    @apply flex items-center justify-center border-dashed text-xs text-ink-muted;
+  }
+
+  .cover-title {
+    @apply mt-2 truncate text-sm font-medium;
+  }
+
+  .cover-meta {
+    @apply truncate text-xs text-ink-muted;
+  }
+
+  /* A cover that is also a radio option. The input is visually hidden and
+     drives the selected ring from CSS, so the picker still works without JS. */
+  .cover-choice {
+    @apply block cursor-pointer;
+  }
+
+  .cover-choice input {
+    @apply sr-only;
+  }
+
+  .cover-choice input:focus-visible ~ .cover-art,
+  .cover-choice:hover .cover-art {
+    @apply border-accent/40;
+  }
+
+  .cover-choice input:checked ~ .cover-art {
+    @apply border-accent ring-2 ring-accent;
+  }
+
+  .choice-row {
+    @apply flex items-center gap-2 text-sm text-ink-muted;
+  }
+}

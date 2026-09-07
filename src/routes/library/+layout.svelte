@@ -9,18 +9,19 @@
   ];
 </script>
 
-<nav class="border-b border-gray-200 px-3">
-  <div class="flex flex-row space-x-1">
-    {#each tabs as tab (tab.href)}
-      <a
-        class="px-3 py-2 font-bold border-b-2 {page.url.pathname === tab.href
-          ? 'border-blue-600 text-blue-600'
-          : 'border-transparent text-gray-600 hover:text-gray-900'}"
-        href={tab.href}
-      >
-        {tab.label}
-      </a>
-    {/each}
+<nav class="border-b border-line">
+  <div class="mx-auto max-w-5xl px-6">
+    <div class="tabs">
+      {#each tabs as tab (tab.href)}
+        <a
+          class="tab"
+          href={tab.href}
+          aria-current={page.url.pathname === tab.href ? "page" : undefined}
+        >
+          {tab.label}
+        </a>
+      {/each}
+    </div>
   </div>
 </nav>
 

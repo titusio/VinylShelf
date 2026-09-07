@@ -1,38 +1,39 @@
 <script lang="ts">
   import { enhance } from "$app/forms";
-  import { authClient } from "$lib/auth-client";
   import type { PageProps } from "./$types";
 
-  const session = authClient.useSession();
   let { data }: PageProps = $props();
 </script>
 
-<h1 class="font-bold text-xl p-3">Artists</h1>
+<div class="page">
+  <header class="page-header">
+    <h1 class="page-title">Artists</h1>
+    <p class="page-subtitle">
+      {data.artists.length}
+      {data.artists.length === 1 ? "artist" : "artists"} on your shelf.
+    </p>
+  </header>
 
-<div class="p-3 m-3">
-  {#each data.artists as artist}
-    <li>Found Artist {artist.name}</li>
-  {/each}
-</div>
+  <form class="card" method="POST" action="?/createArtist" use:enhance>
+    <h2 class="section-title mb-4">Add an artist</h2>
 
-<br />
+    <div class="form-row">
+      <label class="field w-56">
+        <span class="field-label">Name</span>
+        <input class="input" name="name" type="text" />
+      </label>
 
-<div>
-  Found {data.artists.length} Artists!
-
-  <form class="p-3" method="POST" action="?/createArtist" use:enhance>
-    <label
-      >Name
-      <input
-        name="name"
-        type="text"
-        class="mt-1 px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-      />
-    </label>
-    <button
-      class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition m-3"
-    >
-      Add new Artist
-    </button>
+      <button class="btn btn-primary">Add artist</button>
+    </div>
   </form>
+
+  {#if data.artists.length}
+    <ul class="mt-8 divide-y divide-line rounded-card border border-line bg-raised">
+      {#each data.artists as artist (artist.id)}
+        <li class="px-4 py-3 text-sm">{artist.name}</li>
+      {/each}
+    </ul>
+  {:else}
+    <p class="empty-state mt-8">No artists yet. Add one above.</p>
+  {/if}
 </div>
