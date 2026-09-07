@@ -1,4 +1,4 @@
-import { pgTable, text, timestamp, index } from "drizzle-orm/pg-core";
+import { pgTable, text, timestamp, integer, index } from "drizzle-orm/pg-core";
 import { user } from "./auth.schema";
 
 export const artist = pgTable(
@@ -8,6 +8,7 @@ export const artist = pgTable(
       .primaryKey()
       .$defaultFn(() => crypto.randomUUID()),
     name: text("name").notNull(),
+    itunesArtistId: integer("itunes_artist_id").unique(),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at")
       .defaultNow()
@@ -29,6 +30,9 @@ export const record = pgTable(
       .notNull()
       .references(() => artist.id, { onDelete: "cascade" }),
     title: text("title").notNull(),
+    itunesId: integer("itunes_id"),
+    artworkUrl: text("artwork_url"),
+    releaseDate: timestamp("release_date"),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at")
       .defaultNow()
