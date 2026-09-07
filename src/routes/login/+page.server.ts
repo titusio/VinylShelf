@@ -6,7 +6,7 @@ import { auth } from '$lib/server/auth';
 
 export const load: PageServerLoad = (event) => {
   if (event.locals.user) {
-    return redirect(302, '/demo/better-auth');
+    return redirect(302, '/library');
   }
   return {};
 };
@@ -33,7 +33,7 @@ export const actions: Actions = {
       throw e;
     }
 
-    return redirect(302, '/demo/better-auth');
+    return redirect(302, '/library');
   },
 
   signUpEmail: async (event) => {
@@ -58,6 +58,6 @@ export const actions: Actions = {
       throw e;
     }
 
-    return redirect(302, '/demo/better-auth');
+    return redirect(302, '/library');
   }
 };
