@@ -28,6 +28,7 @@ export const record = pgTable(
     artistId: text("artist_id")
       .notNull()
       .references(() => artist.id, { onDelete: "cascade" }),
+    title: text("title").notNull(),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at")
       .defaultNow()

@@ -10,6 +10,12 @@
 
 <h1 class="font-bold text-xl p-3">Library</h1>
 
+<div class="p-3 m-3">
+  {#each data.records as record}
+    <li>Found record: {record.artist.name} - {record.title}</li>
+  {/each}
+</div>
+
 <p class="p-3">
   Hey {$session.data?.user.name}, I hope you are not dizzy from all the spinning
   you've been doing!
@@ -19,7 +25,7 @@
   <label
     >Name
     <input
-      name="name"
+      name="title"
       type="text"
       class="mt-1 px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
     />

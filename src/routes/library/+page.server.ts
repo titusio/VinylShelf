@@ -10,8 +10,15 @@ export const load: PageServerLoad = async ({ request }) => {
   if (!session) redirect(302, "/demo/better-auth");
 
   const artists = await db.query.artist.findMany();
+  const records = await db.query.record.findMany({
+    where: {
+      userId: session.user.id,
+    },
+    with: { artist: true }
+  });
   return {
-    artists
+    artists,
+    records
   };
 };
 
@@ -19,9 +26,14 @@ export const actions = {
   createRecord: async ({ request }) => {
     const data = await request.formData();
     const artistId = data.get("artistId");
+    const title = data.get("title");
 
     if (typeof artistId !== "string" || !artistId) {
       return fail(400, { message: "Artist is required" });
+    }
+
+    if (typeof title !== "string" || !title) {
+      return fail(400, { message: "Title is required" });
     }
 
     const session = await auth.api.getSession({ headers: request.headers });
@@ -39,7 +51,8 @@ export const actions = {
 
     await db.insert(record).values({
       userId: session.user.id,
-      artistId
+      artistId,
+      title
     });
   }
 } satisfies Actions;
