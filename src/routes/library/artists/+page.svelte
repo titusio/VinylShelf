@@ -9,7 +9,7 @@
 
 <h1 class="font-bold text-xl p-3">Artists</h1>
 
-<div>
+<div class="p-3 m-3">
   {#each data.artists as artist}
     <li>Found Artist {artist.name}</li>
   {/each}
