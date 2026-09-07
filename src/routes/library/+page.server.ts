@@ -5,9 +5,9 @@ import { auth } from "$lib/server/auth";
 import type { Actions } from './$types';
 import { db } from "$lib/server/db";
 import { record, artist } from "$lib/server/db/records.schema";
-import { searchAlbums, lookupAlbum } from "$lib/server/itunes";
+import { searchAlbums, lookupAlbum, type AlbumResult } from "$lib/server/itunes";
 
-export const load: PageServerLoad = async ({ request }) => {
+export const load: PageServerLoad = async ({ request, url, fetch }) => {
   const session = await auth.api.getSession({ headers: request.headers });
   if (!session) redirect(302, "/login");
 
@@ -18,57 +18,39 @@ export const load: PageServerLoad = async ({ request }) => {
     },
     with: { artist: true }
   });
-  return {
-    artists,
-    records
-  };
-};
 
-export const actions = {
-  // Step 1: find candidate covers and hand them back for the user to confirm.
-  // Nothing is written to the database here.
-  findCovers: async ({ request, fetch }) => {
-    const data = await request.formData();
-    const artistId = data.get("artistId");
-    const title = data.get("title");
+  // `?title=…&artistId=…` is the cover confirmation step. Searching iTunes
+  // writes nothing, so it belongs in the URL: the step gets its own history
+  // entry, survives a reload, and Back returns to the entry form.
+  const title = url.searchParams.get("title")?.trim();
+  const artistId = url.searchParams.get("artistId");
+  const artistRow = artists.find((a) => a.id === artistId);
 
-    if (typeof artistId !== "string" || !artistId) {
-      return fail(400, { message: "Artist is required" });
-    }
+  let pending = null;
+  if (title && artistId && artistRow) {
+    let candidates: AlbumResult[] = [];
+    let coverError: string | null = null;
 
-    if (typeof title !== "string" || !title) {
-      return fail(400, { message: "Title is required" });
-    }
-
-    const artistRow = await db.query.artist.findFirst({
-      where: {
-        id: artistId
-      }
-    });
-
-    if (!artistRow) {
-      return fail(400, { message: "Unknown artist" });
-    }
-
-    let candidates;
     try {
       candidates = await searchAlbums(`${artistRow.name} ${title}`, { limit: 12, fetch });
     } catch (error) {
       console.error("iTunes search failed", error);
       // Let the user save without a cover rather than blocking on Apple.
-      return fail(502, {
-        message: "Could not reach iTunes. You can still add the record without a cover.",
-        title,
-        artistId,
-        artistName: artistRow.name,
-        candidates: []
-      });
+      coverError = "Could not reach iTunes. You can still add the record without a cover.";
     }
 
-    return { title, artistId, artistName: artistRow.name, candidates };
-  },
+    pending = { title, artistId, artistName: artistRow.name, candidates, coverError };
+  }
 
-  // Step 2: store it. The client sends only the chosen iTunes id; the artwork
+  return {
+    artists,
+    records,
+    pending
+  };
+};
+
+export const actions = {
+  // The only write. The client sends just the chosen iTunes id; the artwork
   // URL and release date are re-fetched here so they can't be forged.
   createRecord: async ({ request, fetch }) => {
     const data = await request.formData();
@@ -138,6 +120,8 @@ export const actions = {
       }
     }
 
-    return { created: true };
+    // Back to the clean shelf URL, so a reload doesn't re-post and the picker
+    // params don't linger in the address bar.
+    redirect(303, "/library");
   }
 } satisfies Actions;

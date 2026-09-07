@@ -1,5 +1,6 @@
 <script lang="ts">
   import { enhance } from "$app/forms";
+  import { goto } from "$app/navigation";
   import { authClient } from "$lib/auth-client";
   import { artworkAt } from "$lib/artwork";
   import type { PageProps } from "./$types";
@@ -8,13 +9,20 @@
 
   let { data, form }: PageProps = $props();
 
-  // findCovers returned a set of candidates: show the confirmation step
-  // instead of the entry form. Both its success and its failure carry
-  // `candidates`, so a failed lookup still lets you save without a cover.
-  const pending = $derived(form && form.candidates ? form : null);
-  const candidates = $derived(pending?.candidates ?? []);
+  const pending = $derived(data.pending);
+  const error = $derived(data.pending?.coverError ?? form?.message ?? null);
 
-  const error = $derived(form && "message" in form ? form.message : null);
+  // The search form is a plain GET, so without JS the browser navigates to the
+  // picker on its own. This does the same navigation through the router to
+  // avoid a full reload; empty fields are dropped so the URL stays readable.
+  const search = (event: SubmitEvent) => {
+    event.preventDefault();
+    const params = new URLSearchParams();
+    for (const [key, value] of new FormData(event.currentTarget as HTMLFormElement)) {
+      if (typeof value === "string" && value) params.set(key, value);
+    }
+    goto(`/library?${params}`);
+  };
 </script>
 
 <div class="page">
@@ -38,9 +46,9 @@
       <h2 class="section-title">Pick a cover</h2>
       <p class="muted mt-1">{pending.artistName} — {pending.title}</p>
 
-      {#if candidates.length}
+      {#if pending.candidates.length}
         <div class="cover-grid mt-6">
-          {#each candidates as candidate, i (candidate.itunesId)}
+          {#each pending.candidates as candidate, i (candidate.itunesId)}
             <label class="cover-choice">
               <input
                 type="radio"
@@ -58,7 +66,7 @@
               </p>
               <p class="cover-meta">
                 {candidate.artistName}{candidate.releaseDate
-                  ? ` · ${new Date(candidate.releaseDate).getFullYear()}`
+                  ? ` · ${candidate.releaseDate.getFullYear()}`
                   : ""}
               </p>
             </label>
@@ -73,7 +81,7 @@
           type="radio"
           name="itunesId"
           value=""
-          checked={!candidates.length}
+          checked={!pending.candidates.length}
         />
         None of these — add without a cover
       </label>
@@ -84,7 +92,7 @@
       </div>
     </form>
   {:else}
-    <form class="card" method="POST" action="?/findCovers" use:enhance>
+    <form class="card" method="GET" action="/library" onsubmit={search}>
       <h2 class="section-title mb-4">Add a record</h2>
 
       <div class="form-row">
