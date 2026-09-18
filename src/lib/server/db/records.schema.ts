@@ -23,9 +23,6 @@ export const record = pgTable(
     id: text("id")
       .primaryKey()
       .$defaultFn(() => crypto.randomUUID()),
-    userId: text("user_id")
-      .notNull()
-      .references(() => user.id, { onDelete: "cascade" }),
     artistId: text("artist_id")
       .notNull()
       .references(() => artist.id, { onDelete: "cascade" }),
@@ -39,5 +36,28 @@ export const record = pgTable(
       .$onUpdate(() => /* @__PURE__ */ new Date())
       .notNull(),
   },
-  (table) => [index("record_userId_idx").on(table.userId)],
+);
+
+export const ownership = pgTable(
+  "ownership",
+  {
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
+    userId: text("user_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    recordId: text("record_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at")
+      .defaultNow()
+      .$onUpdate(() => /* @__PURE__ */ new Date())
+      .notNull(),
+  },
+  (table) => [
+    index("ownership_userId_idx").on(table.userId),
+    index("ownership_recordId_idx").on(table.recordId)
+  ],
 );
