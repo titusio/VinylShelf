@@ -13,6 +13,7 @@
 
     <nav class="flex items-center gap-1">
       <a class="nav-link" href="/library">Library</a>
+      <a class="nav-link" href="/browse">Browse</a>
       {#if data.user}
         <form method="POST" action="/logout">
           <button class="nav-link" type="submit">Logout</button>
