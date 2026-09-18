@@ -18,7 +18,9 @@
   const search = (event: SubmitEvent) => {
     event.preventDefault();
     const params = new URLSearchParams();
-    for (const [key, value] of new FormData(event.currentTarget as HTMLFormElement)) {
+    for (const [key, value] of new FormData(
+      event.currentTarget as HTMLFormElement,
+    )) {
       if (typeof value === "string" && value) params.set(key, value);
     }
     goto(`/library?${params}`);
@@ -33,6 +35,10 @@
       spinning you've been doing!
     </p>
   </header>
+
+  <button onclick={() => goto("/library/records/new")} class="btn btn-primary"
+    >Add new Record</button
+  >
 
   {#if error}
     <p class="alert alert-error mb-6">{error}</p>
