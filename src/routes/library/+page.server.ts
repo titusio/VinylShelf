@@ -12,9 +12,10 @@ export const load: PageServerLoad = async ({ request, url, fetch }) => {
   if (!session) redirect(302, "/login");
 
   const artists = await db.query.artist.findMany();
+  // fixme: there used to be filtering for users here but since
+  // i changed the records to be connected via 'ownership', that changed
   const records = await db.query.record.findMany({
     where: {
-      userId: session.user.id,
     },
     with: { artist: true }
   });
